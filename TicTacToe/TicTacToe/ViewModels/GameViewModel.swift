@@ -2,7 +2,7 @@
 //  GameViewModel.swift
 //  TicTacToe
 //
-//  Created by Marcin Wręga on 17/03/2026.
+//  Created by Artur Żaczek on 19/03/2026.
 //
 
 import SwiftUI
