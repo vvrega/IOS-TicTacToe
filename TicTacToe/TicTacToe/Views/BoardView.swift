@@ -7,10 +7,10 @@
 
 import SwiftUI
 
+// Komponent rysujący siatkę komórek
 struct BoardView: View {
     @ObservedObject var viewModel: GameViewModel
     
-    // Zmienne konfiguracyjne
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
     private let boardSpacing: CGFloat = 15
     private let boardPadding: CGFloat = 15
@@ -19,12 +19,12 @@ struct BoardView: View {
     
     @State private var winningLinePercentage: CGFloat = 0.0
     
+    // Stan przechowujący przesunięcie planszy podczas gestu ciągnięcia
+    @State private var dragOffset: CGSize = .zero
+    
     var body: some View {
         ZStack {
-            // Tło całej planszy
-            Rectangle()
-                .foregroundColor(Color.gray.opacity(0.05))
-                .cornerRadius(20)
+            Rectangle().foregroundColor(Color.gray.opacity(0.05)).cornerRadius(20)
             
             GeometryReader { geometry in
                 ZStack {
@@ -40,80 +40,52 @@ struct BoardView: View {
                     }
                     
                     if let combo = viewModel.winningCombo {
-                        WinningLineView(
-                            winningCombo: combo,
-                            size: geometry.size,
-                            boardSpacing: boardSpacing,
-                            cellHeight: cellHeight
-                        )
-                        .trim(from: 0, to: winningLinePercentage)
-                        .stroke(viewModel.currentPlayer == .x ? Color.blue : Color.red, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: 0.8).delay(0.2)) {
-                                winningLinePercentage = 1.0
+                        WinningLineView(winningCombo: combo, size: geometry.size, boardSpacing: boardSpacing, cellHeight: cellHeight)
+                            .trim(from: 0, to: winningLinePercentage)
+                            .stroke(viewModel.currentPlayer == .x ? Color.blue : Color.red, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                            .onAppear {
+                                withAnimation(.easeInOut(duration: 0.8).delay(0.2)) {
+                                    winningLinePercentage = 1.0
+                                }
                             }
-                        }
                     }
                 }
             }
             .frame(height: boardHeight)
             .padding(boardPadding)
         }
+        // Aplikowanie fizycznego przesunięcia w osi Y
+        .offset(y: dragOffset.height)
+        
+        // SPEŁNIENIE WYMOGU NR 5: Zaawansowana obsługa własnego gestu
+        .gesture(
+            DragGesture()
+                .onChanged { gesture in
+                    // Pozwala ciągnąć planszę tylko w dół (wartości dodatnie)
+                    if gesture.translation.height > 0 {
+                        dragOffset = gesture.translation
+                    }
+                }
+                .onEnded { gesture in
+                    // Jeśli gracz przeciągnął planszę o więcej niż 100 pikseli w dół - resetuje rundę
+                    if gesture.translation.height > 100 {
+                        // Lekka wibracja (Haptic Feedback) przy resecie
+                        let impactMed = UIImpactFeedbackGenerator(style: .medium)
+                        impactMed.impactOccurred()
+                        
+                        withAnimation {
+                            viewModel.resetRound()
+                        }
+                    }
+                    
+                    // Niezależnie od wyniku, plansza wraca na swoje miejsce z efektem sprężyny
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        dragOffset = .zero
+                    }
+                }
+        )
         .onChange(of: viewModel.winningCombo) { _, newValue in
-            if newValue == nil {
-                winningLinePercentage = 0.0
-            }
+            if newValue == nil { winningLinePercentage = 0.0 }
         }
-    }
-}
-
-struct WinningLineView: Shape {
-    let winningCombo: [Int]
-    let size: CGSize
-    let boardSpacing: CGFloat
-    let cellHeight: CGFloat
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        guard winningCombo.count == 3 else { return path }
-        
-        let startCenter = centerPoint(for: winningCombo[0])
-        let endCenter = centerPoint(for: winningCombo[2])
-        
-        let dx = endCenter.x - startCenter.x
-        let dy = endCenter.y - startCenter.y
-        
-        let cellWidth = (size.width - (2 * boardSpacing)) / 3.0
-        
-        var scale: CGFloat = 0
-        
-        if dx != 0 && dy == 0 { // Linia pozioma
-            scale = (cellWidth / 2.0) / abs(dx)
-        } else if dx == 0 && dy != 0 { // Linia pionowa
-            scale = (cellHeight / 2.0) / abs(dy)
-        } else { // Przekątna
-            let scaleX = (cellWidth / 2.0) / abs(dx)
-            let scaleY = (cellHeight / 2.0) / abs(dy)
-            scale = min(scaleX, scaleY)
-        }
-        
-        // Rozciągamy punkty z obu stron za pomocą obliczonego skalera
-        let p1 = CGPoint(x: startCenter.x - (dx * scale), y: startCenter.y - (dy * scale))
-        let p2 = CGPoint(x: endCenter.x + (dx * scale), y: endCenter.y + (dy * scale))
-        
-        path.move(to: p1)
-        path.addLine(to: p2)
-        
-        return path
-    }
-    
-    private func centerPoint(for index: Int) -> CGPoint {
-        let cellWidth = (size.width - (2 * boardSpacing)) / 3.0
-        let row = CGFloat(index / 3)
-        let col = CGFloat(index % 3)
-        let x = col * (cellWidth + boardSpacing) + (cellWidth / 2.0)
-        let y = row * (cellHeight + boardSpacing) + (cellHeight / 2.0)
-        
-        return CGPoint(x: x, y: y)
     }
 }

@@ -7,11 +7,12 @@
 
 import Foundation
 
+// Reprezentuje gracza na planszy (Krzyżyk lub Kółko)
 enum Player: String {
     case x = "X"
     case o = "O"
     
-    // Zwraca przeciwnika
+    // Zwraca gracza przeciwnego (służy do zmiany tury)
     var next: Player {
         self == .x ? .o : .x
     }

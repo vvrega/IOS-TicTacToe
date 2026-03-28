@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Definiuje, który z głównych ekranów aplikacji ma być teraz widoczny
 enum AppScreen: Equatable {
     case start
     case playing

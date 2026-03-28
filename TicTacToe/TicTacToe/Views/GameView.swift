@@ -7,11 +7,14 @@
 
 import SwiftUI
 
+// Widok "Router" - decyduje, który z trzech ekranów pokazać użytkownikowi
 struct GameView: View {
+    // Tworzy i przechowuje instancję ViewModelu dla całej aplikacji
     @StateObject private var viewModel = GameViewModel()
     
     var body: some View {
         Group {
+            // Przełącza ekrany w zależności od stanu w ViewModelu
             switch viewModel.appScreen {
             case .start:
                 StartView(viewModel: viewModel)

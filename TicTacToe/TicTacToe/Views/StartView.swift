@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Ekran startowy umożliwiający wybór liczby rund
 struct StartView: View {
     @ObservedObject var viewModel: GameViewModel
     let predefinedOptions = [1, 3, 5, 10]

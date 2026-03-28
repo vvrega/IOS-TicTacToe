@@ -7,6 +7,7 @@
 
 import Foundation
 
+// Określa aktualny stan trwającej rundy
 enum GameState: Equatable {
     case playing
     case won(Player)

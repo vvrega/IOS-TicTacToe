@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Ekran podsumowania prezentujący ostatecznego zwycięzcę całego meczu
 struct VictoryView: View {
     var winner: Player
     @ObservedObject var viewModel: GameViewModel

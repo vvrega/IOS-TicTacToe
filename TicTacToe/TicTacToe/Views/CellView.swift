@@ -7,11 +7,13 @@
 
 import SwiftUI
 
+// Reprezentuje pojedynczy, klikalny kwadrat na planszy
 struct CellView: View {
     var cell: Cell
     var isWinning: Bool
     var action: () -> Void
     
+    // Kontroluje, czy animacja powiększania znaku X/O się wykonała
     @State private var isAnimating = false
     
     var body: some View {
@@ -22,6 +24,7 @@ struct CellView: View {
                 .cornerRadius(15)
                 .animation(.easeInOut(duration: 0.3), value: isWinning)
             
+            // Wyświetla znak X lub O, jeśli pole jest zajęte
             if let player = cell.player {
                 Text(player.rawValue)
                     .font(.system(size: 65, weight: .heavy, design: .rounded))

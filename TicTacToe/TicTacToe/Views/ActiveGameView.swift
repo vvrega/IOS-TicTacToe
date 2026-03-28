@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Główny widok aktywnej rozgrywki (wynik, plansza i przyciski akcji)
 struct ActiveGameView: View {
     @ObservedObject var viewModel: GameViewModel
     

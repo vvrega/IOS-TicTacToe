@@ -7,11 +7,12 @@
 
 import Foundation
 
+// Model reprezentujący pojedyncze pole na planszy
 struct Cell: Identifiable {
     let id = UUID()
     var player: Player?
     
-    // Sprawdza, czy pole jest jeszcze niezajęte
+    // Sprawdza, czy dane pole nie zostało jeszcze zajęte
     var isEmpty: Bool {
         player == nil
     }
