@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// Model wektorowy (Shape) wyliczający idealne współrzędne dla wygrywającej linii
+// Model wektorowy (Shape) wyliczający współrzędne dla wygrywającej linii
 struct WinningLineView: Shape {
     let winningCombo: [Int]
     let size: CGSize
@@ -22,7 +22,7 @@ struct WinningLineView: Shape {
         let startCenter = centerPoint(for: winningCombo[0])
         let endCenter = centerPoint(for: winningCombo[2])
         
-        // Oblicza wektor kierunkowy, by wydłużyć linię z zachowaniem idealnego kąta
+        // Oblicza wektor kierunkowy, by wydłużyć linię z zachowaniem odpowiedniego kąta
         let dx = endCenter.x - startCenter.x
         let dy = endCenter.y - startCenter.y
         let cellWidth = (size.width - (2 * boardSpacing)) / 3.0
